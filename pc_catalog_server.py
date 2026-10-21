@@ -83,7 +83,7 @@ def recursive_dicts(obj):
  elif isinstance(obj,list):
   for v in obj: yield from recursive_dicts(v)
 
-def extract_products(data, fallback_category=""):
+def extract_products(data):
  # Provider fields may evolve; only normalize records that have a recognizable name and a real product URL/image.
  candidates=[]
  for x in recursive_dicts(data):
