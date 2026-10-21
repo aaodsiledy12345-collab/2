@@ -1,0 +1,26 @@
+PC 정직한 견적 도우미 — 대규모 카탈로그 검색/수집 패키지
+
+포함 파일
+- pc_quote_app.html: 화면
+- pc_catalog_server.py: API 서버
+- catalog_bulk_sync.py: 실제 공급사 API의 이미지/상품 URL이 확인되는 결과를 여러 부품 검색어와 페이지로 순차 수집해 SQLite에 저장
+- catalog_template.csv: 허가된 실제 상품 데이터 CSV 템플릿
+- render.yaml: Render 배포 설정
+
+핵심
+- 100만 개를 임의로 만들어내지 않습니다. 실제 상품 공급사가 제공하는 데이터만 색인합니다.
+- catalog_bulk_sync.py는 서버 환경에 REEF_API_KEY가 설정된 곳에서 실행해야 합니다.
+- 기본 실행은 API 요청량을 제한하기 위해 검색어별 최대 3페이지, 페이지당 최대 40개를 요청합니다. 공급사에서 실제로 제공하는 결과 수가 적으면 저장되는 상품 수도 적습니다.
+- 더 넓은 수집은 공급사 이용약관/요금제/호출 한도를 확인한 뒤 --pages 값을 늘려야 합니다.
+
+일회성 수집 예시 (서버/Render Shell)
+  python catalog_bulk_sync.py --pages 3 --page-size 40
+특정 카테고리만
+  python catalog_bulk_sync.py --category gpu --pages 10 --page-size 40
+
+API 주소
+- 상품 검색: /api/catalog/search?q=RTX&category=gpu&page=1&pageSize=24
+- 가격 조회: /api/parts/prices?ids=danawa:상품ID
+- 상태: /health
+
+100만 종을 실제로 채우려면 공급사에서 100만 종 이상을 포함한 라이선스 데이터 피드/대량 덤프 또는 충분한 API 검색·페이지 접근 권한이 필요합니다. 이 코드만으로 공급사에 없는 상품을 가져오거나 API 제한을 우회할 수는 없습니다.
